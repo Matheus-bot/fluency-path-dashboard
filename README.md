@@ -50,6 +50,9 @@ src/
 ├── mock/                # Dados fictícios para simulação da inteligência artificial
 ├── App.tsx              # Componente principal (Single Page Application Layout)
 └── main.tsx             # Ponto de entrada do React
+```
+
+---
 
 ## Autor
 Matheus Henrique 
