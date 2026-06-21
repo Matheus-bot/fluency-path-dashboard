@@ -4,11 +4,22 @@ import { Volume2 } from "lucide-react"
 import {
   KEY_VOCABULARY,
   MINI_SUMMARY,
+  MINI_SUMMARY_PT,
   THINK_QUESTION,
+  THINK_QUESTION_PT,
+  type LevelCode,
 } from "@/lib/fluency-data"
+import { LEVEL_CONFIG } from "@/lib/levels"
 import { Card, Section } from "./section"
 
-export function BeforeWatching() {
+interface BeforeWatchingProps {
+  level: LevelCode
+  onWatch?: () => void
+}
+
+export function BeforeWatching({ level }: BeforeWatchingProps) {
+  const showTranslations = LEVEL_CONFIG[level].showTranslations
+
   function speak(word: string) {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return
     const utterance = new SpeechSynthesisUtterance(word)
@@ -27,6 +38,11 @@ export function BeforeWatching() {
           <p className="text-sm leading-relaxed text-muted-foreground">
             {MINI_SUMMARY}
           </p>
+          {showTranslations && (
+            <p className="mt-2 text-sm leading-relaxed text-primary/80">
+              {MINI_SUMMARY_PT}
+            </p>
+          )}
           <div className="mt-4 rounded-lg border border-primary/15 bg-accent p-4">
             <p className="mb-1 text-xs font-semibold text-primary">
               Question to think about
@@ -34,6 +50,11 @@ export function BeforeWatching() {
             <p className="text-sm leading-relaxed text-foreground">
               {THINK_QUESTION}
             </p>
+            {showTranslations && (
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {THINK_QUESTION_PT}
+              </p>
+            )}
           </div>
         </Card>
 
@@ -58,7 +79,7 @@ export function BeforeWatching() {
                   <Volume2 className="size-3.5" aria-hidden="true" />
                 </button>
                 <span className="ml-auto max-w-[55%] text-right text-muted-foreground">
-                  {item.definition}
+                  {showTranslations ? item.translation : item.definition}
                 </span>
               </li>
             ))}

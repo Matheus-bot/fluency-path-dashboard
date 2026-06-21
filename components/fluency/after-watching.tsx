@@ -1,20 +1,28 @@
 "use client"
 
-import { useState } from "react"
-import { Sparkles } from "lucide-react"
+import { Loader2, Sparkles } from "lucide-react"
 import { Card, Section } from "./section"
 
 interface AfterWatchingProps {
+  summary: string
+  words: string
+  onSummaryChange: (value: string) => void
+  onWordsChange: (value: string) => void
   onAnalyze: () => void
+  analyzing: boolean
 }
 
 const SUMMARY_MAX = 2000
 const WORDS_MAX = 20
 
-export function AfterWatching({ onAnalyze }: AfterWatchingProps) {
-  const [summary, setSummary] = useState("")
-  const [words, setWords] = useState("")
-
+export function AfterWatching({
+  summary,
+  words,
+  onSummaryChange,
+  onWordsChange,
+  onAnalyze,
+  analyzing,
+}: AfterWatchingProps) {
   const wordCount = words
     .split(",")
     .map((w) => w.trim())
@@ -32,7 +40,7 @@ export function AfterWatching({ onAnalyze }: AfterWatchingProps) {
           </p>
           <textarea
             value={summary}
-            onChange={(e) => setSummary(e.target.value.slice(0, SUMMARY_MAX))}
+            onChange={(e) => onSummaryChange(e.target.value.slice(0, SUMMARY_MAX))}
             placeholder="Type your summary here..."
             rows={5}
             className="w-full resize-none rounded-lg border border-input bg-card p-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/30"
@@ -57,7 +65,7 @@ export function AfterWatching({ onAnalyze }: AfterWatchingProps) {
           </p>
           <textarea
             value={words}
-            onChange={(e) => setWords(e.target.value)}
+            onChange={(e) => onWordsChange(e.target.value)}
             placeholder="Type the words here..."
             rows={5}
             className="w-full resize-none rounded-lg border border-input bg-card p-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/30"
@@ -76,10 +84,20 @@ export function AfterWatching({ onAnalyze }: AfterWatchingProps) {
       <button
         type="button"
         onClick={onAnalyze}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+        disabled={analyzing || !summary.trim()}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        <Sparkles className="size-4" aria-hidden="true" />
-        Analyze My Answer
+        {analyzing ? (
+          <>
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            Analyzing...
+          </>
+        ) : (
+          <>
+            <Sparkles className="size-4" aria-hidden="true" />
+            Analyze My Answer
+          </>
+        )}
       </button>
     </Section>
   )

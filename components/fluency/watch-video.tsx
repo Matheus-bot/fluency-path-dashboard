@@ -6,8 +6,13 @@ import { Play } from "lucide-react"
 import { VIDEO } from "@/lib/fluency-data"
 import { Section } from "./section"
 
-export function WatchVideo() {
+export function WatchVideo({ onPlay }: { onPlay?: () => void }) {
   const [playing, setPlaying] = useState(false)
+
+  function handlePlay() {
+    setPlaying(true)
+    onPlay?.()
+  }
 
   return (
     <Section step={2} title="Watch the Video">
@@ -24,7 +29,7 @@ export function WatchVideo() {
           ) : (
             <button
               type="button"
-              onClick={() => setPlaying(true)}
+              onClick={handlePlay}
               className="group absolute inset-0 size-full cursor-pointer"
               aria-label={`Play video: ${VIDEO.title}`}
             >

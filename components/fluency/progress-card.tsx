@@ -1,7 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { CALENDAR } from "@/lib/fluency-data"
+import { toISODate } from "@/lib/use-progress"
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 const MONTHS = [
@@ -19,15 +20,18 @@ const MONTHS = [
   "December",
 ]
 
+interface ProgressCardProps {
+  studiedDays: string[]
+  onToggleDay: (iso: string) => void
+}
+
 function buildGrid(year: number, month: number) {
   const firstDay = new Date(year, month, 1)
-  // Convert Sun(0)..Sat(6) to Mon(0)..Sun(6)
   const startOffset = (firstDay.getDay() + 6) % 7
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const daysInPrevMonth = new Date(year, month, 0).getDate()
 
   const cells: { day: number; current: boolean }[] = []
-
   for (let i = startOffset - 1; i >= 0; i--) {
     cells.push({ day: daysInPrevMonth - i, current: false })
   }
@@ -41,17 +45,36 @@ function buildGrid(year: number, month: number) {
   return cells
 }
 
-export function ProgressCard() {
-  const cells = buildGrid(CALENDAR.year, CALENDAR.month)
-  const monthLabel = `${MONTHS[CALENDAR.month]} ${CALENDAR.year}`
+export function ProgressCard({ studiedDays, onToggleDay }: ProgressCardProps) {
+  const now = new Date()
+  const [view, setView] = useState({
+    year: now.getFullYear(),
+    month: now.getMonth(),
+  })
+
+  const studiedSet = new Set(studiedDays)
+  const todayIso = toISODate(now)
+  const cells = buildGrid(view.year, view.month)
+  const monthLabel = `${MONTHS[view.month]} ${view.year}`
+
+  function shiftMonth(delta: number) {
+    setView((prev) => {
+      const d = new Date(prev.year, prev.month + delta, 1)
+      return { year: d.getFullYear(), month: d.getMonth() }
+    })
+  }
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">Your Progress</h3>
+      <h3 className="mb-1 text-sm font-semibold text-foreground">Your Progress</h3>
+      <p className="mb-3 text-xs text-muted-foreground">
+        Click a day to mark it as studied.
+      </p>
 
       <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
+          onClick={() => shiftMonth(-1)}
           className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           aria-label="Previous month"
         >
@@ -60,6 +83,7 @@ export function ProgressCard() {
         <span className="text-sm font-medium text-foreground">{monthLabel}</span>
         <button
           type="button"
+          onClick={() => shiftMonth(1)}
           className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           aria-label="Next month"
         >
@@ -75,23 +99,38 @@ export function ProgressCard() {
         ))}
 
         {cells.map((cell, i) => {
-          const isToday = cell.current && cell.day === CALENDAR.today
-          const isStudied =
-            cell.current && CALENDAR.studiedDays.includes(cell.day)
+          if (!cell.current) {
+            return (
+              <div key={i} className="flex justify-center">
+                <span className="flex size-7 items-center justify-center rounded-full text-xs text-muted-foreground/40">
+                  {cell.day}
+                </span>
+              </div>
+            )
+          }
 
-          let style = "text-muted-foreground/40"
-          if (cell.current) style = "text-foreground"
-          if (isStudied)
-            style = "bg-success/15 text-success font-semibold"
-          if (isToday) style = "bg-primary text-primary-foreground font-semibold"
+          const iso = toISODate(new Date(view.year, view.month, cell.day))
+          const isToday = iso === todayIso
+          const isStudied = studiedSet.has(iso)
+
+          let style = "text-foreground hover:bg-accent"
+          if (isStudied) style = "bg-success text-success-foreground font-semibold"
+          if (isToday && !isStudied)
+            style = "bg-primary text-primary-foreground font-semibold"
+          if (isToday && isStudied)
+            style = "bg-primary text-primary-foreground font-semibold ring-2 ring-success ring-offset-1 ring-offset-card"
 
           return (
             <div key={i} className="flex justify-center">
-              <span
-                className={`flex size-7 items-center justify-center rounded-full text-xs ${style}`}
+              <button
+                type="button"
+                onClick={() => onToggleDay(iso)}
+                aria-label={`Toggle studied on ${iso}`}
+                aria-pressed={isStudied}
+                className={`flex size-7 items-center justify-center rounded-full text-xs transition-colors ${style}`}
               >
                 {cell.day}
-              </span>
+              </button>
             </div>
           )
         })}

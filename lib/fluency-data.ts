@@ -48,21 +48,40 @@ export const LEVELS: LevelInfo[] = [
 export interface VocabularyWord {
   word: string
   definition: string
+  translation: string
 }
 
 export const KEY_VOCABULARY: VocabularyWord[] = [
-  { word: "Habit", definition: "a repeated behavior" },
-  { word: "Impact", definition: "a strong effect" },
-  { word: "Consistent", definition: "always acting in the same way" },
-  { word: "Routine", definition: "a regular series of actions" },
-  { word: "Result", definition: "the final outcome of something" },
+  { word: "Habit", definition: "a repeated behavior", translation: "hábito" },
+  { word: "Impact", definition: "a strong effect", translation: "impacto" },
+  {
+    word: "Consistent",
+    definition: "always acting in the same way",
+    translation: "consistente",
+  },
+  {
+    word: "Routine",
+    definition: "a regular series of actions",
+    translation: "rotina",
+  },
+  {
+    word: "Result",
+    definition: "the final outcome of something",
+    translation: "resultado",
+  },
 ]
 
 export const MINI_SUMMARY =
   "In this video, the speaker explains how small daily habits can have a huge impact on our lives. You'll learn how tiny changes in your routine can lead to big results over time."
 
+export const MINI_SUMMARY_PT =
+  "Neste vídeo, o palestrante explica como pequenos hábitos diários podem ter um enorme impacto em nossas vidas. Você vai aprender como pequenas mudanças na sua rotina podem levar a grandes resultados ao longo do tempo."
+
 export const THINK_QUESTION =
   "What small habit could you start today that might improve your life in the long term?"
+
+export const THINK_QUESTION_PT =
+  "Que pequeno hábito você poderia começar hoje que talvez melhore sua vida a longo prazo?"
 
 export const VIDEO = {
   title: "The magic of tiny habits | BJ Fogg",

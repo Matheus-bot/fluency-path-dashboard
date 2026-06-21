@@ -1,10 +1,17 @@
 "use client"
 
-import { ArrowRight, Flame, Star } from "lucide-react"
-import { STATISTICS, STREAK, type LevelInfo } from "@/lib/fluency-data"
+import { ArrowRight, Flame, RotateCcw, Star } from "lucide-react"
+import type { LevelInfo } from "@/lib/fluency-data"
+import type { ProgressState } from "@/lib/use-progress"
 
-export function StudyStreakCard() {
-  const progress = Math.min((STREAK.current / STREAK.best) * 100, 100)
+export function StudyStreakCard({
+  current,
+  best,
+}: {
+  current: number
+  best: number
+}) {
+  const progress = best > 0 ? Math.min((current / best) * 100, 100) : 0
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
@@ -14,7 +21,7 @@ export function StudyStreakCard() {
       </h3>
       <div className="mb-2 flex items-baseline justify-between">
         <span className="text-2xl font-bold text-foreground">
-          {STREAK.current} days
+          {current} {current === 1 ? "day" : "days"}
         </span>
         <span className="text-xs font-medium text-muted-foreground">
           Keep it up!
@@ -23,9 +30,9 @@ export function StudyStreakCard() {
       <div
         className="h-2 w-full overflow-hidden rounded-full bg-secondary"
         role="progressbar"
-        aria-valuenow={STREAK.current}
+        aria-valuenow={current}
         aria-valuemin={0}
-        aria-valuemax={STREAK.best}
+        aria-valuemax={Math.max(best, 1)}
       >
         <div
           className="h-full rounded-full bg-primary transition-all"
@@ -33,18 +40,32 @@ export function StudyStreakCard() {
         />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Best streak: {STREAK.best} days
+        Best streak: {best} {best === 1 ? "day" : "days"}
       </p>
     </div>
   )
 }
 
-export function StatisticsCard() {
+export function StatisticsCard({
+  stats,
+  onReset,
+}: {
+  stats: ProgressState
+  onReset: () => void
+}) {
+  const hours = (stats.minutesStudied / 60).toFixed(1)
+  const items = [
+    { label: "Videos watched", value: String(stats.videosWatched) },
+    { label: "Summaries written", value: String(stats.summariesWritten) },
+    { label: "Words learned", value: String(stats.wordsLearned) },
+    { label: "Hours studied", value: `${hours}h` },
+  ]
+
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
       <h3 className="mb-4 text-sm font-semibold text-foreground">Statistics</h3>
       <ul className="space-y-3">
-        {STATISTICS.map((stat) => (
+        {items.map((stat) => (
           <li
             key={stat.label}
             className="flex items-center justify-between text-sm"
@@ -56,10 +77,11 @@ export function StatisticsCard() {
       </ul>
       <button
         type="button"
-        className="mt-4 flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+        onClick={onReset}
+        className="mt-4 flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-destructive"
       >
-        View all progress
-        <ArrowRight className="size-3.5" aria-hidden="true" />
+        <RotateCcw className="size-3.5" aria-hidden="true" />
+        Reset progress
       </button>
     </div>
   )
