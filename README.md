@@ -39,6 +39,7 @@ A stack do projeto foi escolhida para garantir performance, tipagem estática se
 *   **Deploy:** [Render](https://render.com/)
 
 ---
+https://fluency-path-dashboard.onrender.com
 
 ## 📁 Estrutura de Arquivos Resumida
 
